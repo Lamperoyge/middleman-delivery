@@ -10,10 +10,50 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171101133737) do
+ActiveRecord::Schema.define(version: 20171101153811) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "dishes", force: :cascade do |t|
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+    t.string   "name"
+    t.string   "price"
+    t.string   "options"
+    t.integer  "restaurant_id"
+    t.integer  "order_id"
+    t.index ["order_id"], name: "index_dishes_on_order_id", using: :btree
+    t.index ["restaurant_id"], name: "index_dishes_on_restaurant_id", using: :btree
+  end
+
+  create_table "orders", force: :cascade do |t|
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+    t.integer  "user_id"
+    t.integer  "restaurant_id"
+    t.string   "status"
+    t.string   "address"
+    t.text     "additional_info"
+    t.index ["restaurant_id"], name: "index_orders_on_restaurant_id", using: :btree
+    t.index ["user_id"], name: "index_orders_on_user_id", using: :btree
+  end
+
+  create_table "ratings", force: :cascade do |t|
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+    t.boolean  "value"
+    t.integer  "restaurant_id"
+    t.index ["restaurant_id"], name: "index_ratings_on_restaurant_id", using: :btree
+  end
+
+  create_table "restaurants", force: :cascade do |t|
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+    t.string   "name"
+    t.string   "address"
+    t.string   "phone_number"
+  end
 
   create_table "users", force: :cascade do |t|
     t.string   "email",                  default: "", null: false
@@ -32,4 +72,9 @@ ActiveRecord::Schema.define(version: 20171101133737) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   end
 
+  add_foreign_key "dishes", "orders"
+  add_foreign_key "dishes", "restaurants"
+  add_foreign_key "orders", "restaurants"
+  add_foreign_key "orders", "users"
+  add_foreign_key "ratings", "restaurants"
 end
